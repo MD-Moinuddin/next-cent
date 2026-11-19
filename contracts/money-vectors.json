@@ -1,0 +1,40 @@
+{
+  "valid": [
+    { "input": "14.50", "currency": "EUR", "minor": 1450, "decimal": "14.50" },
+    {
+      "input": " 14.50 ",
+      "currency": "EUR",
+      "minor": 1450,
+      "decimal": "14.50"
+    },
+    { "input": "0.1", "currency": "USD", "minor": 10, "decimal": "0.10" },
+    { "input": "0.07", "currency": "EUR", "minor": 7, "decimal": "0.07" },
+    { "input": "19.99", "currency": "USD", "minor": 1999, "decimal": "19.99" },
+    { "input": "1000", "currency": "JPY", "minor": 1000, "decimal": "1000" },
+    { "input": "1.234", "currency": "KWD", "minor": 1234, "decimal": "1.234" },
+    { "input": "007.5", "currency": "USD", "minor": 750, "decimal": "7.50" },
+    { "input": "0", "currency": "EUR", "minor": 0, "decimal": "0.00" },
+    {
+      "input": "10000000000",
+      "currency": "USD",
+      "minor": 1000000000000,
+      "decimal": "10000000000.00"
+    }
+  ],
+  "invalid": [
+    { "input": "", "currency": "EUR", "code": "invalid_amount" },
+    { "input": "-1", "currency": "EUR", "code": "invalid_amount" },
+    { "input": "1,5", "currency": "EUR", "code": "invalid_amount" },
+    { "input": "1e3", "currency": "EUR", "code": "invalid_amount" },
+    { "input": "abc", "currency": "EUR", "code": "invalid_amount" },
+    { "input": "١٢", "currency": "EUR", "code": "invalid_amount" },
+    { "input": "1.234", "currency": "EUR", "code": "too_many_decimals" },
+    { "input": "1.5", "currency": "JPY", "code": "too_many_decimals" },
+    {
+      "input": "10000000000.01",
+      "currency": "USD",
+      "code": "amount_too_large"
+    },
+    { "input": "1", "currency": "XXX", "code": "unsupported_currency" }
+  ]
+}
