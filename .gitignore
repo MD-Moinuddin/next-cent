@@ -1,0 +1,23 @@
+node_modules/
+.turbo/
+.expo/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.log
+.DS_Store
+*.tsbuildinfo
+dist-e2e/
+playwright-report/
+test-results/
+expo-env.d.ts
+
+# Editor settings
+.vscode/
