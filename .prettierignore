@@ -1,0 +1,9 @@
+packages/api-client/src/generated/
+contracts/openapi.json
+apps/app/dist-e2e/
+apps/app/playwright-report/
+apps/app/test-results/
+apps/app/expo-env.d.ts
+
+# Generated Expo icon asset (not hand-formatted)
+apps/app/assets/expo.icon/

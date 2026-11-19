@@ -1,0 +1,19 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+allowBuilds:
+  lefthook: true
+  # Optional or cosmetic install scripts (native ws speedups, telemetry/funding banners): deliberately not run.
+  "@clerk/shared": false
+  "@parcel/watcher": false
+  browser-tabs-lock: false
+  bufferutil: false
+  core-js: false
+  utf-8-validate: false
+# Expo guidance for pnpm: hoisted node_modules (pnpm 12 ignores `node-linker` in .npmrc).
+nodeLinker: hoisted
+# Security override (Task 21): transitive js-yaml 4.x < 4.3.2 (via expo > @expo/cli > @expo/xcpretty)
+# has high-severity ReDoS/CPU advisories (GHSA-52cp-r559-cp3m, GHSA-5p4m-2wfm-xmqj, GHSA-2883-xcg3-v3hh).
+# Remove once Expo's dependency tree resolves js-yaml >= 4.3.2 on its own.
+overrides:
+  "js-yaml@>=4.0.0 <4.3.2": "^4.3.2"
