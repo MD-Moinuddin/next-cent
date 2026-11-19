@@ -1,0 +1,14 @@
+pre-commit:
+  parallel: true
+  commands:
+    ruff:
+      root: "services/api/"
+      glob: "*.py"
+      run: uv run ruff check {staged_files} && uv run ruff format --check {staged_files}
+    prettier:
+      glob: "*.{ts,tsx,js,json,md,yml}"
+      run: pnpm prettier --check {staged_files}
+commit-msg:
+  commands:
+    conventional:
+      run: bash scripts/check-commit-msg.sh {1}
