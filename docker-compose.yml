@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: nextcent
+      POSTGRES_PASSWORD: nextcent
+      POSTGRES_DB: nextcent
+    ports: ["5433:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nextcent -d nextcent"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  pgdata:
