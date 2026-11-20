@@ -4,7 +4,7 @@ pre-commit:
     ruff:
       root: "services/api/"
       glob: "*.py"
-      run: uv run ruff check {staged_files} && uv run ruff format --check {staged_files}
+      run: uv run ruff check --force-exclude {staged_files} && uv run ruff format --check --force-exclude {staged_files}
     prettier:
       glob: "*.{ts,tsx,js,json,md,yml}"
       run: pnpm prettier --check {staged_files}
