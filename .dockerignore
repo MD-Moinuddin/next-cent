@@ -1,0 +1,22 @@
+# Build context is the repository root (see services/api/Dockerfile).
+.git
+.github
+.turbo
+.expo
+**/node_modules
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+**/*.pyc
+**/.env
+**/.env.*
+!**/.env.example
+**/*.log
+**/.DS_Store
+apps/
+packages/
+contracts/
+docker/
+services/api/tests/
