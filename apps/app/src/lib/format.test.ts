@@ -8,3 +8,26 @@ it("returns the currency symbol", () => {
   expect(currencySymbol("USD", "en-US")).toBe("$");
   expect(currencySymbol("EUR", "en-US")).toBe("€");
 });
+describe("on engines without Intl.NumberFormat formatToParts", () => {
+  const proto = Intl.NumberFormat.prototype;
+  const original = Object.getOwnPropertyDescriptor(proto, "formatToParts");
+
+  beforeEach(() => {
+    Object.defineProperty(proto, "formatToParts", {
+      value: undefined,
+      configurable: true,
+    });
+  });
+  afterEach(() => {
+    if (original) Object.defineProperty(proto, "formatToParts", original);
+  });
+
+  it("still returns the currency symbol", () => {
+    expect(currencySymbol("USD", "en-US")).toBe("$");
+    expect(currencySymbol("EUR", "en-US")).toBe("€");
+    expect(currencySymbol("JPY", "en-US")).toBe("¥");
+  });
+  it("handles a symbol placed after the amount", () => {
+    expect(currencySymbol("EUR", "de-DE")).toBe("€");
+  });
+});

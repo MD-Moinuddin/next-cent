@@ -17,11 +17,20 @@ export function currencySymbol(
   currency: string,
   locale: string = deviceLocale(),
 ): string {
-  const parts = new Intl.NumberFormat(locale, {
+  const formatter = new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-  }).formatToParts(0);
-  return parts.find((p) => p.type === "currency")?.value ?? currency;
+  });
+  if (typeof formatter.formatToParts === "function") {
+    return (
+      formatter.formatToParts(0).find((p) => p.type === "currency")?.value ??
+      currency
+    );
+  }
+  // Some engines (Hermes on mobile) have no formatToParts. Format zero and strip the digits,
+  // separators, spaces and direction marks, which leaves the symbol.
+  const symbol = formatter.format(0).replace(/[0-9.,\s  ‎‏-]/g, "");
+  return symbol.length > 0 && symbol.length <= 4 ? symbol : currency;
 }
 
 export function useMoney() {
