@@ -1,0 +1,4 @@
+# Maestro workspace config. Run the flows with the commands in the task-20 report.
+flows:
+  - quick-add.yaml
+  - edit-delete-undo.yaml

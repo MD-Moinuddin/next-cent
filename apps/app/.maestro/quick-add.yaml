@@ -1,0 +1,38 @@
+# OWNER-PENDING: needs Maestro, a simulator/device with the app installed and a Clerk dev test user.
+# maestro test apps/app/.maestro/quick-add.yaml -e APP_ID=<bundle id> -e E2E_EMAIL=... -e E2E_PASSWORD=...
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: sign-in-email
+- inputText: ${E2E_EMAIL}
+- tapOn:
+    id: sign-in-password
+- inputText: ${E2E_PASSWORD}
+- tapOn:
+    id: sign-in-submit
+- tapOn:
+    id: onboarding-skip
+    optional: true
+- tapOn:
+    id: tab-add
+- tapOn:
+    id: key-1
+- tapOn:
+    id: key-4
+- tapOn:
+    id: key-dot
+- tapOn:
+    id: key-5
+- tapOn:
+    id: key-0
+- tapOn:
+    id: category-chip-groceries
+- tapOn:
+    id: quick-add-save
+- assertVisible: "Expense saved"
+- tapOn:
+    id: tab-transactions
+- assertVisible:
+    id: "tx-row-groceries"

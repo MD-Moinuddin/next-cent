@@ -1,0 +1,38 @@
+# OWNER-PENDING: same requirements as quick-add.yaml (it runs that flow first).
+# maestro test apps/app/.maestro/edit-delete-undo.yaml -e APP_ID=<bundle id> -e E2E_EMAIL=... -e E2E_PASSWORD=...
+appId: ${APP_ID}
+---
+- runFlow: quick-add.yaml
+- tapOn:
+    id: tx-row-groceries
+# Edit: clear "14.50" with five backspaces, then enter 20.
+- tapOn:
+    id: key-back
+- tapOn:
+    id: key-back
+- tapOn:
+    id: key-back
+- tapOn:
+    id: key-back
+- tapOn:
+    id: key-back
+- tapOn:
+    id: key-2
+- tapOn:
+    id: key-0
+- tapOn:
+    id: quick-add-save
+- assertVisible:
+    id: "tx-row-groceries"
+- assertVisible: ".*20\\.00.*"
+# Delete, then Undo from the toast.
+- tapOn:
+    id: tx-row-groceries
+- tapOn:
+    id: transaction-delete
+- assertVisible: "Transaction deleted"
+- assertVisible: "Undo"
+- tapOn:
+    id: toast-action
+- assertVisible:
+    id: "tx-row-groceries"
