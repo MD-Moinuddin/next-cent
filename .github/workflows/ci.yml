@@ -1,0 +1,218 @@
+name: ci
+
+on:
+  # Branch model: feature branches -> `staging` (integration) -> `main` (production).
+  # CI runs on every PR into either branch and on every push to them.
+  pull_request:
+    branches: [staging, main]
+  push:
+    branches: [staging, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+# Supply-chain / release rules for this workflow:
+# - The web bundle is ALWAYS built through `pnpm build:web` (which also runs the
+#   e2e-stub scan), never a raw `expo export`.
+# - `dist-e2e` (the stub-auth bundle used only by Playwright) must NEVER be
+#   uploaded as an artifact or deployed. Only Playwright reports are uploaded.
+# - Node 24: Expo SDK 58 / React Native 0.88 need ^22.13 || ^24.3, and
+#   @hey-api/openapi-ts needs >=22.18. 24 is the active LTS line.
+# - The pnpm version comes from `packageManager` in the root package.json.
+
+jobs:
+  # Gates that enforce the git workflow itself (the local lefthook hooks can be skipped,
+  # CI cannot). Untrusted PR metadata (title, branch names) is passed through `env:`
+  # and never interpolated into the script text.
+  workflow-rules:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Branch flow (feature -> staging -> main)
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          case "$BASE_REF" in
+            main)
+              # Production only receives a release from staging, or an emergency hotfix.
+              if [[ "$HEAD_REF" != "staging" && "$HEAD_REF" != hotfix/* ]]; then
+                echo "::error::PRs into main must come from 'staging' (release) or 'hotfix/*'."
+                exit 1
+              fi
+              ;;
+            staging)
+              # Everything else lands in staging first, from a typed topic branch.
+              if ! [[ "$HEAD_REF" =~ ^(feat|fix|chore|docs|test|ci|build|refactor|perf|style|revert|hotfix|dependabot)/[A-Za-z0-9._/@+-]+$ ]]; then
+                echo "::error::Branch '$HEAD_REF' must be named type/short-description (feat/, fix/, chore/, docs/, test/, ci/, build/, refactor/, perf/, style/, revert/, hotfix/)."
+                exit 1
+              fi
+              ;;
+          esac
+      - name: PR title follows Conventional Commits
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          printf '%s\n' "$PR_TITLE" > "$RUNNER_TEMP/pr-title.txt"
+          bash scripts/check-commit-msg.sh "$RUNNER_TEMP/pr-title.txt"
+      - name: Every commit in the PR follows Conventional Commits
+        # Merge commits created by a release PR (staging -> main) are exempt.
+        if: github.base_ref == 'staging'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          status=0
+          for sha in $(git rev-list --no-merges "$BASE_SHA..$HEAD_SHA"); do
+            git log -1 --format=%s "$sha" > "$RUNNER_TEMP/commit-msg.txt"
+            if ! bash scripts/check-commit-msg.sh "$RUNNER_TEMP/commit-msg.txt" > /dev/null; then
+              echo "::error::Commit $sha does not follow Conventional Commits: $(cat "$RUNNER_TEMP/commit-msg.txt")"
+              status=1
+            fi
+          done
+          exit "$status"
+
+  api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: nextcent
+          POSTGRES_PASSWORD: nextcent
+          POSTGRES_DB: nextcent_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U nextcent -d nextcent_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      NEXTCENT_TEST_DATABASE_URL: postgresql+asyncpg://nextcent:nextcent@localhost:5432/nextcent_test
+    defaults:
+      run:
+        working-directory: services/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+          cache-dependency-glob: services/api/uv.lock
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy src
+      - run: uv run pytest -q
+
+  js:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      # Production web bundle via the package script (includes the stub scan).
+      - name: Build web bundle
+        run: pnpm --filter @nextcent/app build:web
+        env:
+          EXPO_PUBLIC_API_URL: http://localhost:8000
+          EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ci_placeholder
+      - name: Install Playwright browser
+        run: pnpm --filter @nextcent/app exec playwright install --with-deps chromium
+      # `e2e` builds dist-e2e (stub auth) then runs Playwright. Never upload dist-e2e.
+      - name: E2E
+        run: pnpm --filter @nextcent/app e2e
+        env:
+          CI: "true"
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            apps/app/playwright-report
+            apps/app/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+          cache-dependency-glob: services/api/uv.lock
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: uv sync --frozen
+        working-directory: services/api
+      - run: pnpm api:sync
+      - name: Fail if the OpenAPI contract or generated client is out of date
+        # `git add -N` (intent-to-add) makes brand-new generated files visible to
+        # `git diff`, which otherwise ignores untracked files.
+        run: |
+          git add -N contracts packages/api-client/src/generated
+          git diff --exit-code -- contracts packages/api-client/src/generated
+
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --prod --audit-level=high
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      # Audit exactly the locked set (prod + dev: dev tools run in CI too), not the venv.
+      - name: pip-audit (uv.lock)
+        working-directory: services/api
+        run: |
+          uv export --frozen --no-emit-project --no-hashes --no-header > "$RUNNER_TEMP/api-requirements.txt"
+          uvx pip-audit -r "$RUNNER_TEMP/api-requirements.txt" --disable-pip --no-deps

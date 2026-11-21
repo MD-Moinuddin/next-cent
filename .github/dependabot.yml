@@ -1,0 +1,38 @@
+# Dependency updates target `staging` (feature branches -> staging -> main), never main directly.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: staging
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+  # Dependabot supports the `uv` ecosystem (reads pyproject.toml + uv.lock), so the
+  # lockfile is updated directly instead of through a pip requirements shim.
+  - package-ecosystem: uv
+    directory: /services/api
+    target-branch: staging
+    schedule:
+      interval: weekly
+    groups:
+      python-minor-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: staging
+    schedule:
+      interval: weekly
+    groups:
+      actions-minor-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: docker
+    directory: /services/api
+    target-branch: staging
+    schedule:
+      interval: weekly
+    groups:
+      docker-minor-patch:
+        update-types: [minor, patch]
