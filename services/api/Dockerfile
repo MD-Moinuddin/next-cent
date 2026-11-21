@@ -5,7 +5,7 @@
 # ecosystem entry (.github/dependabot.yml, directory /services/api) opens weekly
 # PRs that bump both FROM lines and the uv image tag below.
 
-FROM python:3.12-slim-bookworm AS build
+FROM python:3.15-slim-bookworm AS build
 # Exact uv version (not `latest`) so builds are reproducible.
 COPY --from=ghcr.io/astral-sh/uv:0.13.9 /uv /usr/local/bin/uv
 WORKDIR /app
@@ -18,7 +18,7 @@ COPY services/api/alembic.ini ./
 COPY services/api/migrations ./migrations
 RUN uv sync --frozen --no-dev
 
-FROM python:3.12-slim-bookworm
+FROM python:3.15-slim-bookworm
 RUN useradd --create-home --uid 10001 app
 WORKDIR /app
 COPY --from=build --chown=app:app /app /app
