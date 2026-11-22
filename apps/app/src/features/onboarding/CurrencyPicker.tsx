@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { FlatList, Modal, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -49,7 +50,21 @@ export function CurrencyPicker({
           backgroundColor: colors.card,
         }}
       >
-        <Text>{`${value} ▾`}</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Text>{`${value} ▾`}</Text>
+          <Ionicons
+            name="chevron-down"
+            size={18}
+            color={colors.muted}
+            accessibilityElementsHidden
+          />
+        </View>
       </Pressable>
       <Modal
         visible={open}
@@ -86,13 +101,27 @@ export function CurrencyPicker({
                   close();
                 }}
                 style={{
-                  minHeight: 48,
-                  justifyContent: "center",
-                  borderBottomWidth: 1,
-                  borderBottomColor: colors.line,
+                  minHeight: 52,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingHorizontal: 12,
+                  borderRadius: radius.md,
+                  backgroundColor:
+                    item.code === value ? colors.chip : "transparent",
                 }}
               >
-                <Text>{`${item.code}  ${item.name}`}</Text>
+                <Text
+                  style={{ fontWeight: item.code === value ? "700" : "400" }}
+                >{`${item.code}  ${item.name}`}</Text>
+                {item.code === value ? (
+                  <Ionicons
+                    name="checkmark"
+                    size={20}
+                    color={colors.brand}
+                    accessibilityElementsHidden
+                  />
+                ) : null}
               </Pressable>
             )}
           />

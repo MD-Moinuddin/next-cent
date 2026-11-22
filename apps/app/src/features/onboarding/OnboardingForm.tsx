@@ -5,6 +5,7 @@ import {
   isSupportedCurrency,
   type OnboardingValues,
 } from "@nextcent/shared";
+import { Ionicons } from "@expo/vector-icons";
 import { getLocales } from "expo-localization";
 import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -14,6 +15,7 @@ import { Card } from "@/components/ui/Card";
 import { Text } from "@/components/ui/Text";
 import { TextField } from "@/components/ui/TextField";
 import { t } from "@/i18n/strings";
+import { useTheme } from "@/theme/useTheme";
 import { useMe, usePatchMe } from "@/features/me/hooks";
 import { CurrencyPicker } from "./CurrencyPicker";
 import { fieldError, saveError } from "./messages";
@@ -44,6 +46,7 @@ export function OnboardingForm({
   onDone: () => void;
   allowSkip?: boolean;
 }) {
+  const { colors } = useTheme();
   const patchMe = usePatchMe();
   const me = useMe();
   const [saveFailure, setSaveFailure] = useState<string | null>(null);
@@ -124,8 +127,22 @@ export function OnboardingForm({
           />
         )}
       />
-      <Card>
-        <Text variant="caption" tone="muted">
+      <Card
+        style={{
+          flexDirection: "row",
+          gap: 12,
+          alignItems: "flex-start",
+          backgroundColor: colors.chip,
+          borderColor: colors.chip,
+        }}
+      >
+        <Ionicons
+          name="information-circle-outline"
+          size={22}
+          color={colors.brand}
+          accessibilityElementsHidden
+        />
+        <Text variant="caption" style={{ flex: 1, color: colors.chipInk }}>
           {t.onboarding.explainer}
         </Text>
       </Card>
