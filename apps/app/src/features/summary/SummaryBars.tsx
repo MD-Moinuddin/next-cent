@@ -16,43 +16,79 @@ export function SummaryBars({
   rows: { id: string; icon: string; name: string; total: number }[];
   currency: string;
 }) {
-  const { colors } = useTheme();
+  const { colors, chart, radius } = useTheme();
   const money = useMoney();
   const widths = barWidths(rows.map((r) => r.total));
+  const sum = rows.reduce((a, r) => a + r.total, 0);
   return (
-    <View style={{ gap: 12 }}>
-      {rows.map((r, i) => (
-        <View
-          key={r.id}
-          accessible
-          accessibilityLabel={`${r.name}, ${money.format(r.total, currency)}`}
-          style={{ gap: 4 }}
-        >
+    <View style={{ gap: 14 }}>
+      {rows.map((r, i) => {
+        const color = chart[i % chart.length]!;
+        const percent = sum === 0 ? 0 : Math.round((r.total / sum) * 100);
+        return (
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <Text>{`${r.icon} ${r.name}`}</Text>
-            <Text variant="label">{money.format(r.total, currency)}</Text>
-          </View>
-          <View
-            style={{
-              height: 8,
-              borderRadius: 6,
-              backgroundColor: colors.chip,
-              overflow: "hidden",
-            }}
+            key={r.id}
+            accessible
+            accessibilityLabel={`${r.name}, ${money.format(r.total, currency)}`}
+            style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
           >
             <View
-              testID={`bar-${r.id}`}
               style={{
-                width: `${widths[i] ?? 0}%`,
-                height: "100%",
-                backgroundColor: colors.brand,
+                width: 38,
+                height: 38,
+                borderRadius: radius.md,
+                backgroundColor: colors.chip,
+                alignItems: "center",
+                justifyContent: "center",
               }}
-            />
+            >
+              <Text>{r.icon}</Text>
+            </View>
+            <View style={{ flex: 1, gap: 6 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={{ fontWeight: "600" }}>{r.name}</Text>
+                <Text variant="label" style={{ fontSize: 15 }}>
+                  {money.format(r.total, currency)}
+                </Text>
+              </View>
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    height: 6,
+                    borderRadius: 3,
+                    backgroundColor: colors.chip,
+                    overflow: "hidden",
+                  }}
+                >
+                  <View
+                    testID={`bar-${r.id}`}
+                    style={{
+                      width: `${widths[i] ?? 0}%`,
+                      height: "100%",
+                      backgroundColor: color,
+                    }}
+                  />
+                </View>
+                <Text
+                  variant="caption"
+                  tone="muted"
+                  style={{ width: 34, textAlign: "right" }}
+                >
+                  {`${percent}%`}
+                </Text>
+              </View>
+            </View>
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 }

@@ -8,6 +8,7 @@ import { Text } from "@/components/ui/Text";
 import { TextField } from "@/components/ui/TextField";
 import { t } from "@/i18n/strings";
 import { useMoney } from "@/lib/format";
+import { useTheme } from "@/theme/useTheme";
 import { useSummary } from "./hooks";
 import {
   currentMonth,
@@ -16,10 +17,12 @@ import {
   validateCustomRange,
   type SummaryMode,
 } from "./ranges";
+import { DonutChart } from "./DonutChart";
 import { SummaryBars } from "./SummaryBars";
 
 export function SummaryScreen() {
   const money = useMoney();
+  const { colors, chart } = useTheme();
   const [mode, setMode] = useState<SummaryMode>("month");
   const [ref, setRef] = useState(() => new Date());
   const initial = currentMonth();
@@ -140,21 +143,45 @@ export function SummaryScreen() {
           </Text>
         ) : (
           <>
-            <Card style={{ gap: 8 }}>
-              <Line
-                label={t.summary.income}
-                value={money.format(data.income_minor, data.currency)}
-                tone="good"
-              />
-              <Line
-                label={t.summary.spent}
-                value={money.format(data.expense_minor, data.currency)}
-              />
-              <Line
-                label={t.summary.net}
-                value={money.format(data.net_minor, data.currency)}
-                tone={data.net_minor < 0 ? "bad" : "good"}
-              />
+            <Card
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 16,
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
+              {data.by_category.length > 0 ? (
+                <DonutChart
+                  segments={data.by_category.map((c, i) => ({
+                    id: c.category_id,
+                    value: c.total_minor,
+                    color: chart[i % chart.length]!,
+                  }))}
+                  centerLabel={t.summary.spent}
+                  centerValue={money.format(data.expense_minor, data.currency)}
+                  track={colors.chip}
+                  textColor={colors.ink}
+                  mutedColor={colors.muted}
+                />
+              ) : null}
+              <View style={{ flex: 1, minWidth: 160, gap: 10 }}>
+                <Line
+                  label={t.summary.income}
+                  value={money.format(data.income_minor, data.currency)}
+                  tone="good"
+                />
+                <Line
+                  label={t.summary.spent}
+                  value={money.format(data.expense_minor, data.currency)}
+                />
+                <Line
+                  label={t.summary.net}
+                  value={money.format(data.net_minor, data.currency)}
+                  tone={data.net_minor < 0 ? "bad" : "good"}
+                />
+              </View>
             </Card>
             {data.by_category.length > 0 ? (
               <Card style={{ gap: 12 }}>
