@@ -117,10 +117,10 @@ test.describe("dark mode", () => {
     void mock;
     await page.goto("/");
     await expect(page.getByTestId("home-balance")).toBeVisible();
-    // The app really rendered its dark palette (bg #0B0F17), so this is not a vacuous light-mode run.
+    // The app really rendered its dark palette (bg #0A1628), so this is not a vacuous light-mode run.
     await expect
       .poll(() =>
-        page.locator('[style*="background-color: rgb(11, 15, 23)"]').count(),
+        page.locator('[style*="background-color: rgb(10, 22, 40)"]').count(),
       )
       .toBeGreaterThan(0);
   });
