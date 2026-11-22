@@ -1,5 +1,7 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs, usePathname, useRouter } from "expo-router";
-import { Text, View } from "react-native";
+import { View, type ColorValue } from "react-native";
+import { AddTabButton } from "@/components/AddTabButton";
 import { Button } from "@/components/ui/Button";
 import { Text as UiText } from "@/components/ui/Text";
 import { useMe } from "@/features/me/hooks";
@@ -13,9 +15,24 @@ import { useTheme } from "@/theme/useTheme";
 // tab, which redirects away from it, so Settings > Categories and the onboarding redirect would never arrive.)
 const HIDDEN_TAB = { display: "none" } as const;
 
-const icon = (glyph: string) =>
-  function TabIcon() {
-    return <Text accessibilityElementsHidden>{glyph}</Text>;
+type IconName = keyof typeof Ionicons.glyphMap;
+// Outline when inactive, filled when active.
+const icon = (outline: IconName, filled: IconName) =>
+  function TabIcon({
+    color,
+    focused,
+  }: {
+    color: ColorValue;
+    focused: boolean;
+  }) {
+    return (
+      <Ionicons
+        name={focused ? filled : outline}
+        size={24}
+        color={color as string}
+        accessibilityElementsHidden
+      />
+    );
   };
 
 export default function AppLayout() {
@@ -59,14 +76,20 @@ export default function AppLayout() {
         tabBarInactiveTintColor: colors.muted,
         // Explicit surfaces so the tab labels keep AA contrast (the default active background is a saturated blue).
         tabBarActiveBackgroundColor: "transparent",
-        tabBarStyle: { backgroundColor: colors.card },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: "600" },
+        tabBarStyle: {
+          backgroundColor: colors.card,
+          borderTopColor: colors.line,
+          // Onboarding is a focused flow: no tab bar until it is finished.
+          ...(pathname === "/onboarding" ? { display: "none" as const } : {}),
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: t.tabs.home,
-          tabBarIcon: icon("🏠"),
+          tabBarIcon: icon("home-outline", "home"),
           tabBarButtonTestID: "tab-home",
         }}
       />
@@ -74,7 +97,7 @@ export default function AppLayout() {
         name="transactions"
         options={{
           title: t.tabs.transactions,
-          tabBarIcon: icon("📋"),
+          tabBarIcon: icon("list-outline", "list"),
           tabBarButtonTestID: "tab-transactions",
         }}
       />
@@ -82,8 +105,13 @@ export default function AppLayout() {
         name="add"
         options={{
           title: t.tabs.add,
-          tabBarIcon: icon("＋"),
-          tabBarButtonTestID: "tab-add",
+          tabBarButton: (props) => (
+            <AddTabButton
+              onPress={props.onPress}
+              testID="tab-add"
+              raised={!isWide}
+            />
+          ),
         }}
         listeners={{
           tabPress: (e) => {
@@ -96,7 +124,7 @@ export default function AppLayout() {
         name="summary"
         options={{
           title: t.tabs.summary,
-          tabBarIcon: icon("📊"),
+          tabBarIcon: icon("bar-chart-outline", "bar-chart"),
           tabBarButtonTestID: "tab-summary",
         }}
       />
@@ -104,7 +132,7 @@ export default function AppLayout() {
         name="settings"
         options={{
           title: t.tabs.settings,
-          tabBarIcon: icon("⚙️"),
+          tabBarIcon: icon("settings-outline", "settings"),
           tabBarButtonTestID: "tab-settings",
         }}
       />
