@@ -14,6 +14,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { View } from "react-native";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
+import { Segmented } from "@/components/ui/Segmented";
 import { Keypad, type KeypadKey } from "@/components/ui/Keypad";
 import { Text } from "@/components/ui/Text";
 import { TextField } from "@/components/ui/TextField";
@@ -189,21 +190,15 @@ export function TransactionForm({
         >
           {title}
         </Text>
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          <Chip
-            testID="kind-expense"
-            label={t.common.expense}
-            selected={!income}
-            onPress={() => setValue("kind", "expense", revalidate)}
-          />
-          <Chip
-            testID="kind-income"
-            label={t.common.income}
-            selected={income}
-            onPress={() => setValue("kind", "income", revalidate)}
-          />
-        </View>
       </View>
+      <Segmented
+        value={kind}
+        onChange={(k) => setValue("kind", k, revalidate)}
+        options={[
+          { value: "expense", label: t.common.expense, testID: "kind-expense" },
+          { value: "income", label: t.common.income, testID: "kind-income" },
+        ]}
+      />
 
       <CurrencyPicker
         label={t.form.currency}
@@ -217,6 +212,7 @@ export function TransactionForm({
       <Text
         variant="amount"
         testID="quick-add-amount"
+        style={{ textAlign: "center", fontSize: 52, paddingVertical: 8 }}
         accessibilityRole="text"
         accessibilityLabel={`${t.form.amount}: ${amount || "0"} ${currency}`}
       >

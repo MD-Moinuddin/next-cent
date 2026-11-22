@@ -48,6 +48,15 @@ export function Button({
         opacity: inactive ? 0.5 : 1,
         borderWidth: variant === "primary" ? 0 : 1,
         borderColor: colors.line,
+        ...(variant === "primary"
+          ? {
+              shadowColor: colors.brand,
+              shadowOpacity: 0.3,
+              shadowRadius: 12,
+              shadowOffset: { width: 0, height: 6 },
+              elevation: 3,
+            }
+          : {}),
       }}
     >
       {loading ? (
