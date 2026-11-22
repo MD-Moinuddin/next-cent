@@ -12,10 +12,10 @@ import { TextField } from "@/components/ui/TextField";
 import { useCategories } from "@/features/categories/hooks";
 import { dayLabel } from "@/features/home/helpers";
 import { t } from "@/i18n/strings";
-import { deviceLocale } from "@/lib/format";
+import { deviceLocale, formatMoney } from "@/lib/format";
 import { useDebouncedValue } from "@/lib/useDebouncedValue";
 import { CategoryFilter } from "./CategoryFilter";
-import { groupByDate } from "./group";
+import { dayNet, groupByDate } from "./group";
 import { useTransactionsInfinite, type TransactionFilters } from "./hooks";
 import { pendingIds, usePendingPuts } from "./pending";
 import { TransactionRow } from "./TransactionRow";
@@ -156,21 +156,36 @@ export function TransactionsScreen() {
             <Text tone="muted">{t.transactions.loadingMore}</Text>
           ) : undefined
         }
-        renderSectionHeader={({ section }) => (
-          <Text
-            variant="label"
-            tone="muted"
-            accessibilityRole="header"
-            style={{ paddingTop: 12, paddingBottom: 4 }}
-          >
-            {dayLabel(section.title, now, locale)}
-          </Text>
-        )}
-        renderItem={({ item }) => (
+        renderSectionHeader={({ section }) => {
+          const net = dayNet(section.data);
+          return (
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "baseline",
+                paddingTop: 16,
+                paddingBottom: 8,
+              }}
+            >
+              <Text variant="label" tone="muted" accessibilityRole="header">
+                {dayLabel(section.title, now, locale)}
+              </Text>
+              {net ? (
+                <Text variant="label" tone="muted">
+                  {`${net.minor < 0 ? "−" : "+"}${formatMoney(Math.abs(net.minor), net.currency, locale)}`}
+                </Text>
+              ) : null}
+            </View>
+          );
+        }}
+        renderItem={({ item, index, section }) => (
           <TransactionRow
             tx={item}
             category={item.category_id ? byId.get(item.category_id) : undefined}
             pending={pending.has(item.id)}
+            first={index === 0}
+            last={index === section.data.length - 1}
             onPress={() => router.push(`/transaction/${item.id}` as Href)}
           />
         )}

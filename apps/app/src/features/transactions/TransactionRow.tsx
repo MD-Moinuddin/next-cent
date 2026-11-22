@@ -11,14 +11,18 @@ export function TransactionRow({
   tx,
   category,
   pending,
+  first = true,
+  last = true,
   onPress,
 }: {
   tx: TransactionOut;
   category?: CategoryOut;
   pending: boolean;
+  first?: boolean;
+  last?: boolean;
   onPress: () => void;
 }) {
-  const { colors } = useTheme();
+  const { colors, radius } = useTheme();
   const locale = deviceLocale();
   const income = tx.kind === "income";
   const categoryName = category?.name ?? t.transactions.uncategorized;
@@ -45,19 +49,39 @@ export function TransactionRow({
       accessibilityLabel={label}
       onPress={onPress}
       style={{
-        minHeight: 56,
+        minHeight: 64,
         flexDirection: "row",
         alignItems: "center",
         gap: 12,
+        paddingHorizontal: 14,
+        backgroundColor: colors.card,
+        borderColor: colors.line,
+        borderLeftWidth: 1,
+        borderRightWidth: 1,
+        borderTopWidth: first ? 1 : 0,
         borderBottomWidth: 1,
-        borderBottomColor: colors.line,
+        borderTopLeftRadius: first ? radius.lg : 0,
+        borderTopRightRadius: first ? radius.lg : 0,
+        borderBottomLeftRadius: last ? radius.lg : 0,
+        borderBottomRightRadius: last ? radius.lg : 0,
       }}
     >
-      <Text accessibilityElementsHidden importantForAccessibility="no">
-        {income ? "💼" : (category?.icon ?? "🧾")}
-      </Text>
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: radius.md,
+          backgroundColor: colors.chip,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text>{income ? "💼" : (category?.icon ?? "🧾")}</Text>
+      </View>
       <View style={{ flex: 1 }}>
-        <Text>{`${title} `}</Text>
+        <Text style={{ fontWeight: "600" }}>{`${title} `}</Text>
         <Text variant="caption" tone="muted">
           {`${captionText} `}
         </Text>

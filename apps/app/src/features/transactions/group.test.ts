@@ -1,5 +1,5 @@
 import type { TransactionOut } from "@/lib/types";
-import { groupByDate } from "./group";
+import { dayNet, groupByDate } from "./group";
 
 const tx = (id: string, d: string) =>
   ({ id, occurred_on: d, created_at: `${d}T00:00:00Z` }) as TransactionOut;
@@ -24,3 +24,24 @@ it("sorts days newest first even when input interleaves them", () => {
 });
 it("returns an empty list for no items", () =>
   expect(groupByDate([])).toEqual([]));
+
+const money = (kind: "income" | "expense", minor: number, currency = "EUR") =>
+  ({ kind, amount_minor: minor, currency }) as TransactionOut;
+
+it("nets a day: income minus expenses", () => {
+  expect(
+    dayNet([
+      money("income", 5000),
+      money("expense", 1250),
+      money("expense", 250),
+    ]),
+  ).toEqual({ minor: 3500, currency: "EUR" });
+  expect(dayNet([money("expense", 400)])).toEqual({
+    minor: -400,
+    currency: "EUR",
+  });
+});
+it("has no day total for an empty day or mixed currencies", () => {
+  expect(dayNet([])).toBeNull();
+  expect(dayNet([money("expense", 1), money("expense", 1, "USD")])).toBeNull();
+});
