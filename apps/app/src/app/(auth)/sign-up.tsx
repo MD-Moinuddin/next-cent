@@ -1,15 +1,18 @@
 import { useSignUp } from "@clerk/expo/legacy";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
+import { AuthShell } from "@/components/auth/AuthShell";
 import { Button } from "@/components/ui/Button";
-import { Screen } from "@/components/ui/Screen";
 import { Text } from "@/components/ui/Text";
 import { TextField } from "@/components/ui/TextField";
 import { t } from "@/i18n/strings";
+import { clerkErrorMessage } from "@/lib/auth/clerkError";
+import { useTheme } from "@/theme/useTheme";
 
 export default function SignUp() {
   const { signUp, setActive, isLoaded } = useSignUp();
   const router = useRouter();
+  const { colors } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -25,8 +28,8 @@ export default function SignUp() {
       await signUp.create({ emailAddress: email.trim(), password });
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       setPendingVerification(true);
-    } catch {
-      setError(t.errors.generic);
+    } catch (e) {
+      setError(clerkErrorMessage(e) ?? t.errors.generic);
     } finally {
       setBusy(false);
     }
@@ -44,18 +47,15 @@ export default function SignUp() {
         await setActive({ session: res.createdSessionId });
         router.replace("/");
       } else setError(t.errors.generic);
-    } catch {
-      setError(t.errors.generic);
+    } catch (e) {
+      setError(clerkErrorMessage(e) ?? t.errors.generic);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <Screen>
-      <Text variant="title" accessibilityRole="header">
-        {t.auth.signUp}
-      </Text>
+    <AuthShell title={t.auth.signUp}>
       {pendingVerification ? (
         <>
           <TextField
@@ -103,8 +103,16 @@ export default function SignUp() {
         </>
       )}
       <Link href="/sign-in">
-        <Text tone="muted">{t.auth.haveAccount}</Text>
+        <Text
+          style={{
+            color: colors.brand,
+            fontWeight: "600",
+            paddingVertical: 12,
+          }}
+        >
+          {t.auth.haveAccount}
+        </Text>
       </Link>
-    </Screen>
+    </AuthShell>
   );
 }
