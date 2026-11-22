@@ -36,6 +36,7 @@ export const t = {
     noAccount: "New here? Create account",
     haveAccount: "Already have an account? Sign in",
     tagline: "Track every cent. Know what's next.",
+    points: ["Private", "Works offline", "Export anytime"],
   },
   sync: {
     waiting: (n: number) => `${n} waiting to sync`,
