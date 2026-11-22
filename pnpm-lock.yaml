@@ -196,6 +196,9 @@ importers:
       '@clerk/expo':
         specifier: ^4.16.2
         version: 4.16.2(07ed7d32f5fb786f9aeeed9d7d3bd301)
+      '@expo/vector-icons':
+        specifier: ^15.1.1
+        version: 15.1.1(expo-font@58.0.12)(react-native@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(bufferutil@4.2.0)(supports-color@8.1.1))(@types/react@19.3.0)(bufferutil@4.2.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       '@hookform/resolvers':
         specifier: ^7.0.6
         version: 7.0.6(ajv@8.18.0)(react-hook-form@7.92.0(@types/react@19.3.0)(react@19.3.0))(superstruct@2.0.2)(zod@4.6.7)
@@ -1259,6 +1262,13 @@ packages:
         optional: true
       react-native-worklets:
         optional: true
+
+  '@expo/vector-icons@15.1.1':
+    resolution: {integrity: sha512-Iu2VkcoI5vygbtYngm7jb4ifxElNVXQYdDrYkT7UCEIiKLeWnQY0wf2ZhHZ+Wro6Sc5TaumpKUOqDRpLi5rkvw==}
+    peerDependencies:
+      expo-font: '>=14.0.4'
+      react: '*'
+      react-native: '*'
 
   '@expo/ws-tunnel@2.0.1':
     resolution: {integrity: sha512-mljsRffbOHzmSimYQbQu9h9NR3alwCCwEEouRGFL4QRTt8dNvsNtKEPa/5jHmtDLDtsh4xXsWKwzjN9BTpeXHQ==}
@@ -7702,6 +7712,12 @@ snapshots:
       react-dom: 19.3.0(react@19.3.0)
       react-native-worklets: 0.13.0(@babel/core@7.29.13(supports-color@8.1.1))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(bufferutil@4.2.0)(supports-color@8.1.1))(react-native@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(bufferutil@4.2.0)(supports-color@8.1.1))(@types/react@19.3.0)(bufferutil@4.2.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)(supports-color@8.1.1)
     optional: true
+
+  '@expo/vector-icons@15.1.1(expo-font@58.0.12)(react-native@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(bufferutil@4.2.0)(supports-color@8.1.1))(@types/react@19.3.0)(bufferutil@4.2.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)':
+    dependencies:
+      expo-font: 58.0.12(expo@58.0.26)(react-native@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(bufferutil@4.2.0)(supports-color@8.1.1))(@types/react@19.3.0)(bufferutil@4.2.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
+      react: 19.3.0
+      react-native: 0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(bufferutil@4.2.0)(supports-color@8.1.1))(@types/react@19.3.0)(bufferutil@4.2.0)(react@19.3.0)(supports-color@8.1.1)
 
   '@expo/ws-tunnel@2.0.1(ws@8.23.0(bufferutil@4.2.0)(utf-8-validate@6.0.6))':
     dependencies:
