@@ -43,6 +43,11 @@ export const palette = {
     chipInk: "#F1F5F9",
   },
 } as const;
+// Category colours for charts: distinct in lightness as well as hue, so they stay apart without relying on colour alone.
+export const chartColors = {
+  light: ["#0F4C81", "#38BDF8", "#6366F1", "#F97316", "#64748B", "#A855F7"],
+  dark: ["#7DD3FC", "#818CF8", "#FB923C", "#C4B5FD", "#94A3B8", "#FDBA74"],
+} as const;
 export type Colors = { [K in keyof (typeof palette)["light"]]: string };
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 } as const;
 export const radius = { sm: 8, md: 12, lg: 16, xl: 24, pill: 999 } as const;
