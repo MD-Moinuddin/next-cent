@@ -39,9 +39,9 @@ export function Button({
         if (!inactive) onPress();
       }}
       style={{
-        minHeight: 48,
+        minHeight: 52,
         paddingHorizontal: 16,
-        borderRadius: radius.md,
+        borderRadius: radius.lg,
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: bg,

@@ -1,4 +1,5 @@
 import { View, type ViewProps } from "react-native";
+import { shadow } from "@/theme/tokens";
 import { useTheme } from "@/theme/useTheme";
 
 export function Card({ style, ...rest }: ViewProps) {
@@ -13,6 +14,7 @@ export function Card({ style, ...rest }: ViewProps) {
           borderWidth: 1,
           borderColor: colors.line,
           padding: spacing.lg,
+          ...shadow.card,
         },
         style,
       ]}

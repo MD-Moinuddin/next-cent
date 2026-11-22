@@ -31,7 +31,10 @@ export function Chip({
     >
       <Text
         variant="caption"
-        style={{ color: selected ? colors.brandInk : colors.ink }}
+        style={{
+          color: selected ? colors.brandInk : colors.chipInk,
+          fontWeight: selected ? "600" : "500",
+        }}
       >
         {label}
       </Text>
