@@ -11,6 +11,9 @@ export const palette = {
     brandDeep: "#0B2545", // hero surfaces (white on it 16:1)
     brandDeepInk: "#FFFFFF",
     brandDeepMuted: "#BCD3EA",
+    heroShapeA: "#12356A", // decorative circles and progress track on the hero card
+    heroShapeB: "#0F2E5A",
+    heroTrack: "#34506F",
     accent: "#38BDF8", // secondary: the Add button, progress, highlights (ink on it 7.6:1)
     accentInk: "#0B2545",
     good: "#0F4C81", // income; always paired with a "+" sign
@@ -29,6 +32,9 @@ export const palette = {
     brandDeep: "#0D2B52",
     brandDeepInk: "#FFFFFF",
     brandDeepMuted: "#BCD3EA",
+    heroShapeA: "#12356A", // decorative circles and progress track on the hero card
+    heroShapeB: "#0F2E5A",
+    heroTrack: "#34506F",
     accent: "#38BDF8",
     accentInk: "#0B2545",
     good: "#7DD3FC",
