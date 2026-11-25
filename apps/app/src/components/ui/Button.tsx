@@ -47,7 +47,7 @@ export function Button({
         backgroundColor: bg,
         opacity: inactive ? 0.5 : 1,
         borderWidth: variant === "primary" ? 0 : 1,
-        borderColor: colors.line,
+        borderColor: variant === "danger" ? colors.bad : colors.line,
         ...(variant === "primary"
           ? {
               shadowColor: colors.brand,

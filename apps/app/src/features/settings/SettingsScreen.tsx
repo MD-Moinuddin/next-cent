@@ -1,7 +1,8 @@
 import { minorToDecimalString } from "@nextcent/shared";
+import { Ionicons } from "@expo/vector-icons";
 import { onlineManager, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ComponentProps, type ReactNode } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "@/components/ui/Button";
@@ -135,12 +136,14 @@ export function SettingsScreen() {
       <Card style={{ padding: 0 }}>
         <Row
           testID="settings-currency"
+          icon="cash-outline"
           label={t.settings.homeCurrency}
           value={profile?.home_currency ?? "—"}
           onPress={profile ? openProfile : undefined}
         />
         <Row
           testID="settings-opening"
+          icon="wallet-outline"
           label={t.settings.openingBalance}
           value={
             profile
@@ -154,6 +157,7 @@ export function SettingsScreen() {
         />
         <Row
           testID="settings-income"
+          icon="trending-up-outline"
           label={t.settings.monthlyIncome}
           value={
             profile?.monthly_income_minor
@@ -171,17 +175,20 @@ export function SettingsScreen() {
       <Card style={{ padding: 0 }}>
         <Row
           testID="settings-categories"
+          icon="grid-outline"
           label={t.settings.categories}
           value={t.settings.manage}
           onPress={() => router.push("/categories")}
         />
         <Row
           testID="settings-recurring"
+          icon="repeat-outline"
           label={t.settings.recurring}
           value={t.settings.manage}
           onPress={() => router.push("/recurring")}
         />
         <Row
+          icon="contrast-outline"
           label={t.settings.appearance}
           value={t.settings.followsSystem}
           last
@@ -274,13 +281,17 @@ export function SettingsScreen() {
   );
 }
 
+type IconName = ComponentProps<typeof Ionicons>["name"];
+
 function Row({
+  icon,
   label,
   value,
   onPress,
   testID,
   last,
 }: {
+  icon: IconName;
   label: string;
   value: ReactNode;
   onPress?: () => void;
@@ -293,15 +304,31 @@ function Row({
     paddingHorizontal: 16,
     flexDirection: "row" as const,
     alignItems: "center" as const,
-    justifyContent: "space-between" as const,
-    gap: 8,
+    gap: 12,
     borderBottomWidth: last ? 0 : 1,
     borderBottomColor: colors.line,
   };
   const body = (
     <>
-      <Text>{typeof value === "string" ? `${label} ` : label}</Text>
+      <View
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 12,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: colors.chip,
+        }}
+      >
+        <Ionicons name={icon} size={20} color={colors.chipInk} />
+      </View>
+      <Text style={{ flex: 1 }}>
+        {typeof value === "string" ? `${label} ` : label}
+      </Text>
       <Text tone="muted">{value}</Text>
+      {onPress ? (
+        <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+      ) : null}
     </>
   );
   if (!onPress) {
